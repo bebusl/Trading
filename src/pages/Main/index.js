@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import DepositGrid from "../../components/DepositGrid";
 import { Button, Card, Layout, Space, Statistic } from "antd";
-import { LinkOutlined, LogoutOutlined } from "@ant-design/icons";
+import { LinkOutlined, LogoutOutlined, HeartOutlined } from "@ant-design/icons";
 import { Navigate, useLocation } from "react-router-dom";
 import { dashboardRequest } from "../../api/transactionAPI";
 import { logoff } from "../../utils";
+import { useSSEState } from "../../context/SSEContext";
 const { Header, Content } = Layout;
 
 const headerStyle = {
@@ -19,13 +20,13 @@ const contentStyle = {
   padding: "2rem",
 };
 
-const CustomCard = ({
-  title = "title",
-  value = 1000000000,
-  icon = { LinkOutlined },
-}) => (
+const CustomCard = ({ title = "title", value = 1000000000, today = false }) => (
   <Card>
-    <Statistic title={title} value={value} prefix={<LinkOutlined />} />
+    <Statistic
+      title={title}
+      value={value}
+      prefix={today ? <HeartOutlined /> : <LinkOutlined />}
+    />
   </Card>
 );
 
@@ -36,6 +37,7 @@ function Main() {
   const userName = sessionStorage.getItem("userName");
 
   const [dashboard, setDashboard] = useState({});
+  const { SSEClient } = useSSEState();
 
   useEffect(() => {
     (async () => {
@@ -49,7 +51,25 @@ function Main() {
         console.error("FAILED TO FETCH DASHBOARD DATA");
       }
     })();
+
+    const updateDashboardData = (event) => {
+      console.log("GET DASHBOARD", event);
+      const data = JSON.parse(event.data);
+      setDashboard((prev) => Object.assign({}, prev, data));
+    };
+
+    SSEClient?.addEventListener("dashboard", updateDashboardData);
+
+    return () => {
+      if (SSEClient)
+        SSEClient.removeEventListener("dashboard", updateDashboardData);
+    };
   }, []);
+
+  const handleClickLogoffBtn = () => {
+    logoff();
+    setDashboard({});
+  };
 
   if (!userName) {
     window.alert("로그아웃 되었습니다.");
@@ -67,7 +87,7 @@ function Main() {
               type="text"
               icon={<LogoutOutlined />}
               style={{ color: "white" }}
-              onClick={logoff}
+              onClick={handleClickLogoffBtn}
             >
               로그아웃
             </Button>
@@ -90,13 +110,26 @@ function Main() {
               title="전날 잔금 총액"
               value={dashboard.ytotalBalance}
             />
-            <CustomCard title="금일 입금 총액" value={dashboard.totalDeposit} />
+            <CustomCard
+              title="금일 입금 총액"
+              value={dashboard.totalDeposit}
+              today={true}
+            />
             <CustomCard
               title="금일 출금 총액"
               value={dashboard.totalWithdraw}
+              today={true}
             />
-            <CustomCard title="금일 수수료 총액" value={dashboard.totalFee} />
-            <CustomCard title="금일 잔금 총액" value={dashboard.totalBalance} />
+            <CustomCard
+              title="금일 수수료 총액"
+              value={dashboard.totalFee}
+              today={true}
+            />
+            <CustomCard
+              title="금일 잔금 총액"
+              value={dashboard.totalBalance}
+              today={true}
+            />
           </div>
 
           <DepositGrid companyList={companyList} />

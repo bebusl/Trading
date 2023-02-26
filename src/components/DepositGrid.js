@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-enterprise";
 import "ag-grid-community/styles/ag-grid.css";
@@ -12,9 +6,10 @@ import "ag-grid-community/styles/ag-theme-alpine.css";
 import { Button, DatePicker, Select } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { Option } from "antd/es/mentions";
-import { connectSSE, rangeFormatter } from "../utils";
+import { rangeFormatter } from "../utils";
 import { transactionRequest } from "../api/transactionAPI";
 import dayjs from "dayjs";
+import { useSSEState } from "../context/SSEContext";
 
 const { RangePicker } = DatePicker;
 
@@ -26,8 +21,7 @@ const DepositGrid = ({ companyList }) => {
   const today = useMemo(() => dayjs().format("YYYY MM/DD"), []);
   const [rowData, setRowData] = useState();
   const isToday = useRef(true);
-  const eventSource = useRef(null);
-
+  const { SSEClient } = useSSEState();
   const columnDefs = [
     {
       field: "txTime",
@@ -72,21 +66,18 @@ const DepositGrid = ({ companyList }) => {
   ];
 
   useEffect(() => {
-    eventSource.current = connectSSE();
-    eventSource.current.addEventListener("tx", (event) => {
+    const updateRowData = (event) => {
+      console.log("GET rowdata", event);
+
       const data = JSON.parse(event.data);
-      console.log("DATA COMMING", isToday.current);
-      if (isToday.current) {
-        console.log("this is today");
-        setRowData((prev) => [data, ...prev]);
-      } else {
-        console.log("THIS IS FILTER");
-      }
-    });
+      if (isToday.current) setRowData((prev) => [data, ...prev]);
+    };
+
+    SSEClient?.addEventListener("tx", updateRowData);
 
     return () => {
-      if (eventSource.current) {
-        eventSource.current.close();
+      if (SSEClient) {
+        SSEClient.removeEventListener("tx", updateRowData);
       }
     };
   }, []);
@@ -112,7 +103,7 @@ const DepositGrid = ({ companyList }) => {
       endDt: range[1] || today + " 24:00",
     };
     isToday.current = !range[0] && !range[1] ? true : false;
-    console.log("필터 적용 중이니?", !isToday.current);
+
     try {
       const res = await transactionRequest(data);
       if (res.data.success) setRowData(res.data.txs);
@@ -125,9 +116,9 @@ const DepositGrid = ({ companyList }) => {
   };
 
   const onCompanyChange = (value) => {
-    console.log("SELECTED COMPANY", value);
     setCompany(value);
   };
+
   const onRangeChange = (value) => {
     const formedRange = rangeFormatter(value[0], value[1]);
     setRange(formedRange);
@@ -137,6 +128,7 @@ const DepositGrid = ({ companyList }) => {
     e.preventDefault();
     fetchData();
   };
+
   return (
     <div style={containerStyle}>
       <div
