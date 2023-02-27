@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import DepositGrid from "../../components/DepositGrid";
 import { Button, Card, Layout, Space, Statistic } from "antd";
 import { LinkOutlined, LogoutOutlined, HeartOutlined } from "@ant-design/icons";
-import { Navigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { dashboardRequest } from "../../api/transactionAPI";
 import { logoff } from "../../utils";
 import { useSSEState } from "../../context/SSEContext";
@@ -18,6 +18,7 @@ const headerStyle = {
 const contentStyle = {
   textAlign: "center",
   padding: "2rem",
+  minHeight: "calc( 100vh - 64px )",
 };
 
 const CustomCard = ({ title = "title", value = 1000000000, today = false }) => (
@@ -33,6 +34,7 @@ const CustomCard = ({ title = "title", value = 1000000000, today = false }) => (
 function Main() {
   const location = useLocation();
   const companyList = location.state?.companyList || [];
+  const isMobile = useMemo(() => window.matchMedia("(max-width: 600px)"), []);
 
   const userName = sessionStorage.getItem("userName");
 
@@ -71,10 +73,10 @@ function Main() {
     setDashboard({});
   };
 
-  if (!userName) {
-    window.alert("로그아웃 되었습니다.");
-    return <Navigate to="/login"></Navigate>;
-  }
+  // if (!userName) {
+  //   window.alert("로그아웃 되었습니다.");
+  //   return <Navigate to="/login"></Navigate>;
+  // }
 
   return (
     <Layout>
@@ -95,41 +97,52 @@ function Main() {
         </div>
       </Header>
       <Content style={contentStyle}>
-        <Space direction="vertical" style={{ width: "100%" }} size={[0, 100]}>
+        <Space
+          direction="vertical"
+          style={{ width: "100%" }}
+          size={isMobile ? [0, 30] : [0, 100]}
+        >
           <div className="card-container">
-            <CustomCard
-              title="전날 입금 총액"
-              value={dashboard.ytotalDeposit}
-            />
-            <CustomCard
-              title="전날 출금 총액"
-              value={dashboard.ytotalWithdraw}
-            />
-            <CustomCard title="전날 수수료 총액" value={dashboard.ytotalFee} />
-            <CustomCard
-              title="전날 잔금 총액"
-              value={dashboard.ytotalBalance}
-            />
-            <CustomCard
-              title="금일 입금 총액"
-              value={dashboard.totalDeposit}
-              today={true}
-            />
-            <CustomCard
-              title="금일 출금 총액"
-              value={dashboard.totalWithdraw}
-              today={true}
-            />
-            <CustomCard
-              title="금일 수수료 총액"
-              value={dashboard.totalFee}
-              today={true}
-            />
-            <CustomCard
-              title="금일 잔금 총액"
-              value={dashboard.totalBalance}
-              today={true}
-            />
+            <div className="card-wrapper">
+              <CustomCard
+                title="전날 입금 총액"
+                value={dashboard.ytotalDeposit}
+              />
+              <CustomCard
+                title="전날 출금 총액"
+                value={dashboard.ytotalWithdraw}
+              />
+              <CustomCard
+                title="전날 수수료 총액"
+                value={dashboard.ytotalFee}
+              />
+              <CustomCard
+                title="전날 잔금 총액"
+                value={dashboard.ytotalBalance}
+              />
+            </div>
+            <div className="card-wrapper">
+              <CustomCard
+                title="금일 입금 총액"
+                value={dashboard.totalDeposit}
+                today={true}
+              />
+              <CustomCard
+                title="금일 출금 총액"
+                value={dashboard.totalWithdraw}
+                today={true}
+              />
+              <CustomCard
+                title="금일 수수료 총액"
+                value={dashboard.totalFee}
+                today={true}
+              />
+              <CustomCard
+                title="금일 잔금 총액"
+                value={dashboard.totalBalance}
+                today={true}
+              />
+            </div>
           </div>
 
           <DepositGrid companyList={companyList} />
