@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
-import "ag-grid-enterprise";
+
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import { Button, DatePicker, Select } from "antd";
@@ -68,7 +68,6 @@ const DepositGrid = ({ companyList }) => {
   useEffect(() => {
     const updateRowData = (event) => {
       console.log("GET rowdata", event);
-
       const data = JSON.parse(event.data);
       if (isToday.current) setRowData((prev) => [data, ...prev]);
     };
@@ -111,6 +110,7 @@ const DepositGrid = ({ companyList }) => {
       console.error("fetch data error");
     }
   };
+
   const onGridReady = () => {
     fetchData();
   };
@@ -139,7 +139,7 @@ const DepositGrid = ({ companyList }) => {
         }}
       >
         <p style={{ fontSize: "18px" }}>입/출금 현황</p>
-        <div>
+        <div style={{ display: "flex" }}>
           <Select
             placeholder="회사"
             onChange={onCompanyChange}
