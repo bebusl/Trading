@@ -1,9 +1,10 @@
 body {
   margin: 0;
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: Pretendard, Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #475060;
+  box-sizing: border-box;
 }
 
 code {
