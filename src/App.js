@@ -1,7 +1,7 @@
 import "antd/dist/reset.css";
 import { ConfigProvider, theme } from "antd";
 import { customTheme } from "./style/theme";
-import "./App.css";
+import "./style/App.css";
 
 import DefaultRouter from "./DefaultRouter";
 
