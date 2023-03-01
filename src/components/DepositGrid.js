@@ -5,7 +5,6 @@ import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 import { Button, DatePicker, Select } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
-import { Option } from "antd/es/mentions";
 import { rangeFormatter } from "../utils";
 import { transactionRequest } from "../api/transactionAPI";
 import dayjs from "dayjs";
@@ -13,8 +12,8 @@ import { useSSEState } from "../context/SSEContext";
 
 const { RangePicker } = DatePicker;
 
-const DepositGrid = ({ companyList }) => {
-  const [company, setCompany] = useState(companyList[0]);
+const DepositGrid = ({ companyList, updateDashboard }) => {
+  const [company, setCompany] = useState(companyList[0].companyName);
   const [range, setRange] = useState([]);
   const containerStyle = useMemo(() => ({ width: "100%", height: "60vh" }), []);
   const gridStyle = useMemo(() => ({ height: "100%", width: "100%" }), []);
@@ -22,6 +21,7 @@ const DepositGrid = ({ companyList }) => {
   const [rowData, setRowData] = useState();
   const isToday = useRef(true);
   const { SSEClient } = useSSEState();
+
   const columnDefs = [
     {
       field: "txTime",
@@ -67,9 +67,11 @@ const DepositGrid = ({ companyList }) => {
 
   useEffect(() => {
     const updateRowData = (event) => {
-      console.log("GET rowdata", event);
       const data = JSON.parse(event.data);
-      if (isToday.current) setRowData((prev) => [data, ...prev]);
+      // SSE로 이벤트 왔을 때 컴퍼니 필터링
+      if (isToday.current && company === data.companyName)
+        setRowData((prev) => [data, ...prev]);
+      //if (isToday.current) setRowData((prev) => [data, ...prev]);
     };
 
     SSEClient?.addEventListener("tx", updateRowData);
@@ -95,9 +97,9 @@ const DepositGrid = ({ companyList }) => {
     };
   }, []);
 
-  const fetchData = async () => {
+  const fetchData = async (value) => {
     const data = {
-      companyName: company,
+      companyName: value || company,
       startDt: range[0] || today + " 00:00",
       endDt: range[1] || today + " 24:00",
     };
@@ -117,6 +119,9 @@ const DepositGrid = ({ companyList }) => {
 
   const onCompanyChange = (value) => {
     setCompany(value);
+    // company change 되면 데이터 갱신 바로되게 하기 + dashboard정보도 업데이트
+    fetchData(value);
+    updateDashboard(value);
   };
 
   const onRangeChange = (value) => {
@@ -143,12 +148,12 @@ const DepositGrid = ({ companyList }) => {
           <Select
             placeholder="회사"
             onChange={onCompanyChange}
-            defaultValue={companyList[0]}
+            defaultValue={companyList[0].companyName}
           >
             {companyList?.map((company) => (
-              <Option value={company} key={company}>
-                {company}
-              </Option>
+              <Select.Option value={company.companyName} key={company}>
+                {company.companyName}
+              </Select.Option>
             ))}
           </Select>
           <RangePicker
