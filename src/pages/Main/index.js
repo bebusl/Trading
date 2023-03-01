@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import DepositGrid from "../../components/DepositGrid";
 import { Button, Card, Layout, Space, Statistic } from "antd";
 import { LinkOutlined, LogoutOutlined, HeartOutlined } from "@ant-design/icons";
-import { useLocation } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { dashboardRequest } from "../../api/transactionAPI";
 import { logoff } from "../../utils";
 import { useSSEState } from "../../context/SSEContext";
@@ -44,7 +44,7 @@ function Main() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await dashboardRequest(companyList[0]);
+        const res = await dashboardRequest(companyList[0].companyName);
         if (res.data.success) {
           const { success, ...data } = res.data;
           setDashboard(data);
@@ -57,6 +57,7 @@ function Main() {
     const updateDashboardData = (event) => {
       console.log("GET DASHBOARD", event);
       const data = JSON.parse(event.data);
+      // 실시간 업데이트 필터링 company이름은 그냥 전역적으로 관리해야겠네...
       setDashboard((prev) => Object.assign({}, prev, data));
     };
 
@@ -68,15 +69,27 @@ function Main() {
     };
   }, []);
 
+  const updateDashboard = useCallback(async (company) => {
+    try {
+      const res = await dashboardRequest(company);
+      if (res.data.success) {
+        const { success, ...data } = res.data;
+        setDashboard(data);
+      }
+    } catch (e) {
+      console.error("FAILED TO FETCH DASHBOARD DATA");
+    }
+  }, []);
+
   const handleClickLogoffBtn = () => {
     logoff();
     setDashboard({});
   };
 
-  // if (!userName) {
-  //   window.alert("로그아웃 되었습니다.");
-  //   return <Navigate to="/login"></Navigate>;
-  // }
+  if (!userName) {
+    window.alert("로그아웃 되었습니다.");
+    return <Navigate to="/login"></Navigate>;
+  }
 
   return (
     <Layout>
@@ -145,7 +158,10 @@ function Main() {
             </div>
           </div>
 
-          <DepositGrid companyList={companyList} />
+          <DepositGrid
+            companyList={companyList}
+            updateDashboard={updateDashboard}
+          />
         </Space>
       </Content>
     </Layout>
