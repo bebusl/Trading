@@ -15,7 +15,7 @@ export function rangeFormatter(start, end) {
 export function connectSSE() {
   const accessToken = sessionStorage.getItem("accessToken");
   if (!accessToken) return null;
-  const eventSource = new EventSourcePolyfill(SSE_BASE_URL + "/v1/subscribe", {
+  const eventSource = new EventSourcePolyfill(SSE_BASE_URL, {
     withCredentials: true,
     headers: {
       Authorization: accessToken,
