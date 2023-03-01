@@ -68,8 +68,16 @@ const DepositGrid = ({ companyList, updateDashboard }) => {
   useEffect(() => {
     const updateRowData = (event) => {
       const data = JSON.parse(event.data);
+      console.log(
+        "GET EVENT",
+        company,
+        data.companyName,
+        company == data.companyName,
+        company === data.companyName,
+        data
+      );
       // SSE로 이벤트 왔을 때 컴퍼니 필터링
-      if (isToday.current && company === data.companyName)
+      if (isToday.current && company == data.companyName)
         setRowData((prev) => [data, ...prev]);
       //if (isToday.current) setRowData((prev) => [data, ...prev]);
     };
@@ -151,7 +159,10 @@ const DepositGrid = ({ companyList, updateDashboard }) => {
             defaultValue={companyList[0].companyName}
           >
             {companyList?.map((company) => (
-              <Select.Option value={company.companyName} key={company}>
+              <Select.Option
+                value={company.companyName}
+                key={company.companyName}
+              >
                 {company.companyName}
               </Select.Option>
             ))}
