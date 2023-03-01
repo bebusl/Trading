@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { EventSourcePolyfill } from "event-source-polyfill";
-import { BASE_URL } from "./constant/url";
+import { SSE_BASE_URL } from "./constant/url";
 
 export function rangeFormatter(start, end) {
   const format = "YYYY MM/DD";
@@ -15,7 +15,7 @@ export function rangeFormatter(start, end) {
 export function connectSSE() {
   const accessToken = sessionStorage.getItem("accessToken");
   if (!accessToken) return null;
-  const eventSource = new EventSourcePolyfill(BASE_URL + "/v1/subscribe", {
+  const eventSource = new EventSourcePolyfill(SSE_BASE_URL + "/v1/subscribe", {
     withCredentials: true,
     headers: {
       Authorization: accessToken,
@@ -70,6 +70,3 @@ export function getCookie(name) {
 export function eraseCookie(name) {
   document.cookie = name + "=;path=/; Max-Age=-99999999;";
 }
-/**
- * "{"bank":"KB","txType":"DEPOSIT","name":"윤정환\r","amount":15000000,"fee":180000,"totalAmount":5300000,"txTime":"2023-02-25T21:51:00"}"
- */

@@ -1,9 +1,9 @@
 import axios from "axios";
-import { BASE_URL } from "../constant/url";
+import { API_BASE_URL } from "../constant/url";
 
 function AxiosFactory(config = {}) {
   const baseConfig = {
-    baseURL: BASE_URL,
+    baseURL: API_BASE_URL,
   };
   const axiosInstance = axios.create(Object.assign(baseConfig, config));
 
