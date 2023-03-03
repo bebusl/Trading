@@ -6,7 +6,7 @@ export const addCompanyRequest = ({
   companyName,
   feeRate,
 }) => {
-  return secureFetch.get("/v1/admin/company", {
+  return secureFetch.post("/v1/admin/company", {
     username,
     password,
     companyName,
