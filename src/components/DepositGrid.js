@@ -18,7 +18,7 @@ const DepositGrid = ({ companyList, updateDashboard }) => {
   const containerStyle = useMemo(() => ({ width: "100%", height: "60vh" }), []);
   const gridStyle = useMemo(() => ({ height: "100%", width: "100%" }), []);
   const today = useMemo(() => dayjs().format("YYYY MM/DD"), []);
-  const [rowData, setRowData] = useState();
+  const [rowData, setRowData] = useState([]);
   const isToday = useRef(true);
   const { SSEClient } = useSSEState();
 
@@ -64,7 +64,9 @@ const DepositGrid = ({ companyList, updateDashboard }) => {
       valueFormatter: (params) => params.value.toLocaleString(),
     },
   ];
-
+  useEffect(() => {
+    console.log(`COMPANY STATE ${company}로 바뀜`);
+  }, [company]);
   useEffect(() => {
     const updateRowData = (event) => {
       const data = JSON.parse(event.data);
@@ -77,8 +79,9 @@ const DepositGrid = ({ companyList, updateDashboard }) => {
         data
       );
       // SSE로 이벤트 왔을 때 컴퍼니 필터링
-      if (isToday.current && company == data.companyName)
+      if (isToday.current && company == data.companyName) {
         setRowData((prev) => [data, ...prev]);
+      }
       //if (isToday.current) setRowData((prev) => [data, ...prev]);
     };
 
@@ -94,9 +97,6 @@ const DepositGrid = ({ companyList, updateDashboard }) => {
   const defaultColDef = useMemo(() => {
     return {
       editable: true,
-      enableRowGroup: true,
-      enablePivot: true,
-      enableValue: true,
       sortable: true,
       resizable: true,
       filter: true,
@@ -153,11 +153,7 @@ const DepositGrid = ({ companyList, updateDashboard }) => {
       >
         <p style={{ fontSize: "18px" }}>입/출금 현황</p>
         <div style={{ display: "flex" }}>
-          <Select
-            placeholder="회사"
-            onChange={onCompanyChange}
-            defaultValue={companyList[0].companyName}
-          >
+          <Select placeholder="회사" onChange={onCompanyChange} value={company}>
             {companyList?.map((company) => (
               <Select.Option
                 value={company.companyName}
