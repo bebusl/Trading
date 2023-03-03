@@ -1,8 +1,10 @@
+import { lazy } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { SSEContextProvider } from "./context/SSEContext";
+
 import Login from "./pages/Login";
-import Main from "./pages/Main";
 import NotFound from "./pages/NotFound";
+const Main = lazy(() => import("./pages/Main"));
 
 const DefaultRouter = () => (
   <Routes>
