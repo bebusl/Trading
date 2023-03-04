@@ -48,6 +48,7 @@
   "proxy": "https://bankone.kro.kr/api/v1/subscribe",
   "devDependencies": {
     "cypress": "^12.7.0",
-    "http-proxy-middleware": "^2.0.6"
+    "http-proxy-middleware": "^2.0.6",
+    "sse-fake-server": "^1.0.4"
   }
 }
