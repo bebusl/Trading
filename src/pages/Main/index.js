@@ -49,7 +49,6 @@ function Main() {
       endDt: dateRange[1] || today + " 24:00",
     };
     isToday.current = !dateRange[0] && !dateRange[1] ? true : false;
-
     try {
       const res = await transactionRequest(data);
       if (res.data.success) setRowData(res.data.txs);
@@ -58,36 +57,30 @@ function Main() {
     }
   }, [curCompany, dateRange, today]);
 
-  useEffect(() => {
-    const updateRowData = (event) => {
+  const updateRowData = useCallback(
+    (event) => {
       const data = JSON.parse(event.data);
       console.log(
-        "GET EVENT",
-        curCompany.companyName,
-        data.companyName,
-        curCompany.companyName === data.companyName,
-        data
+        `CUR ::: ${curCompany.companyName} || receive data::: ${data.companyName}`
       );
-      // SSE로 이벤트 왔을 때 컴퍼니 필터링
       if (isToday.current && curCompany.companyName === data.companyName) {
         setRowData((prev) => [data, ...prev]);
       }
-      //if (isToday.current) setRowData((prev) => [data, ...prev]);
-    };
+    },
+    [curCompany]
+  );
 
-    //**temp */
-    // SSEClient.addEventListener("tx", updateRowData);
-
-    return () => {
-      // if (SSEClient) {
-      //   SSEClient.removeEventListener("tx", updateRowData);
-      // }
-    };
-  }, []);
-
-  //선택한 컴퍼니 바뀌면 Data도 바뀜
   useEffect(() => {
     fetchGridRowData();
+
+    //**temp */
+    SSEClient.addEventListener("tx", updateRowData);
+
+    return () => {
+      if (SSEClient) {
+        SSEClient.removeEventListener("tx", updateRowData);
+      }
+    };
   }, [curCompany]);
 
   return (

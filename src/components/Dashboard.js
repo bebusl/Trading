@@ -21,7 +21,7 @@ const tTitleMapper = {
 const yElementKeys = Object.keys(yTitleMapper);
 const tElementKeys = Object.keys(tTitleMapper);
 
-function Dashboard(props) {
+function Dashboard() {
   const { curCompany } = useFilterState();
   const [dashboardInfo, setDashboardInfo] = useState({
     ytotalDeposit: 0,
@@ -38,20 +38,21 @@ function Dashboard(props) {
 
   useEffect(() => {
     const getRealtimeDashboardData = (event) => {
-      console.log("GET DASHBOARD", event);
       const data = JSON.parse(event.data);
+      console.log("GET DASHBOARD", data.companyName);
+
       if (data.companyName === curCompany.companyName)
         setDashboardInfo((prev) => Object.assign({}, prev, data));
     };
 
-    ///**temp block */
-    //SSEClient?.addEventListener("dashboard", getRealtimeDashboardData);
+    /**temp block */
+    SSEClient?.addEventListener("dashboard", getRealtimeDashboardData);
 
-    // return () => {
-    //   if (SSEClient)
-    //     SSEClient.removeEventListener("dashboard", getRealtimeDashboardData);
-    // };
-  }, []);
+    return () => {
+      if (SSEClient)
+        SSEClient.removeEventListener("dashboard", getRealtimeDashboardData);
+    };
+  }, [curCompany]);
 
   useEffect(() => {
     (async () => {

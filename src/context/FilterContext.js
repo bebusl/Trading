@@ -24,8 +24,8 @@ export const FilterContextProvider = ({ children }) => {
   const updateCurCompany = (data) => {
     if (typeof data === "string")
       data = { companyName: data, feeRate: feeRate[data] };
-
-    setCurCompany(data);
+    const realData = Object.assign({}, data);
+    setCurCompany(realData);
   };
 
   const updateDateRange = (value) => {

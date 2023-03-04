@@ -19,11 +19,9 @@ function Login() {
     if (isRemembered) rememberId(values.id);
     try {
       const res = await loginRequest(values);
-      if (res.data?.success) {
+      if (res.data.success) {
         login(res.data);
-        navigate("/main", {
-          state: { companyList: res.data.user.companyList },
-        });
+        navigate("/main");
       }
     } catch (e) {
       setError(true);
