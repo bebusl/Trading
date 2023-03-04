@@ -1,12 +1,10 @@
-import React, { useMemo, useRef } from "react";
+import React, { useMemo } from "react";
 import { AgGridReact } from "ag-grid-react";
 
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
 
 import dayjs from "dayjs";
-import { useSSEState } from "../context/SSEContext";
-import { useFilterState } from "../context/FilterContext";
 
 const columnDefs = [
   {
@@ -63,10 +61,6 @@ const DepositGrid = ({ rowData, fetchData }) => {
       minWidth: 100,
     };
   }, []);
-
-  const { SSEClient } = useSSEState();
-  const { companyList, curCompany, updateCurCompany, dateRange } =
-    useFilterState();
 
   return (
     <div style={containerStyle}>
