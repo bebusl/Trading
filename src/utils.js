@@ -34,12 +34,14 @@ export function login(data) {
   sessionStorage.setItem("accessToken", "Bearer " + data.accessToken);
   sessionStorage.setItem("userName", data.user.username);
   sessionStorage.setItem("authority", JSON.stringify(data.user.authority));
+  sessionStorage.setItem("companyList", JSON.stringify(data.user.companyList));
 }
 
 export function logoff() {
   sessionStorage.removeItem("accessToken");
   sessionStorage.removeItem("userName");
   sessionStorage.removeItem("authority");
+  sessionStorage.removeItem("companyList");
 }
 
 export function getUser() {
