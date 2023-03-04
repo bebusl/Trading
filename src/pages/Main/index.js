@@ -12,7 +12,6 @@ import Dashboard from "../../components/Dashboard";
 import Filter from "../../components/Filter";
 import HeaderContent from "../../components/HeaderContent";
 import dayjs from "dayjs";
-import { ROLE_ADMIN } from "../../constant/role";
 import { useFilterState } from "../../context/FilterContext";
 import { transactionRequest } from "../../api/transactionAPI";
 const { Header, Content } = Layout;
@@ -30,15 +29,12 @@ const contentStyle = {
   minHeight: "calc( 100vh - 64px )",
 };
 
-function Main() {
+function Main({ isAdmin }) {
   const isMobile = useMemo(() => window.matchMedia("(max-width: 600px)"), []);
   const [rowData, setRowData] = useState([]);
   const today = useMemo(() => dayjs().format("YYYY MM/DD"), []);
   const isToday = useRef(true);
-  const isAdmin = useMemo(
-    () => JSON.parse(sessionStorage.getItem("authority")).includes(ROLE_ADMIN),
-    []
-  );
+
   const { SSEClient } = useSSEState();
   const { curCompany, dateRange } = useFilterState();
 
@@ -86,7 +82,7 @@ function Main() {
   return (
     <Layout>
       <Header style={headerStyle}>
-        <HeaderContent />
+        <HeaderContent isAdmin={isAdmin} />
       </Header>
       <Content style={contentStyle}>
         <Space

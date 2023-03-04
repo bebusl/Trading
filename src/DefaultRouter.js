@@ -5,6 +5,11 @@ import { SSEContextProvider } from "./context/SSEContext";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Main from "./pages/Main";
+import withAuth from "./hoc/withAuth";
+import Admin from "./pages/Admin";
+
+const MainWithAuth = withAuth(Main);
+const AdminWithAuth = withAuth(Admin);
 
 const DefaultRouter = () => (
   <Routes>
@@ -16,11 +21,12 @@ const DefaultRouter = () => (
       element={
         <SSEContextProvider>
           <FilterContextProvider>
-            <Main />
+            <MainWithAuth />
           </FilterContextProvider>
         </SSEContextProvider>
       }
     />
+    <Route path="/admin" element={<AdminWithAuth />} />
   </Routes>
 );
 
