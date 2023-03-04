@@ -6,4 +6,6 @@ export const BASE_URL = "https://bankone.kro.kr";
 
 export const API_BASE_URL = `${BASE_URL}/api`;
 
-export const SSE_BASE_URL = `${API_BASE_URL}/v1/sse/subscribe`;
+export const SSE_BASE_URL = isDev
+  ? "http://localhost:5555/stream"
+  : `${API_BASE_URL}/v1/sse/subscribe`;
