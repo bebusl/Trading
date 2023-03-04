@@ -14,6 +14,8 @@ import HeaderContent from "../../components/HeaderContent";
 import dayjs from "dayjs";
 import { useFilterState } from "../../context/FilterContext";
 import { transactionRequest } from "../../api/transactionAPI";
+import AddDataModal from "../../components/AddDataModal";
+import createXml from "../../createXml";
 const { Header, Content } = Layout;
 
 const headerStyle = {
@@ -93,8 +95,8 @@ function Main({ isAdmin }) {
           <Dashboard />
           <h2 style={{ textAlign: "left" }}>입/출금 현황</h2>
           <div style={{ display: "flex", justifyContent: "end" }}>
-            {isAdmin && <Button>데이터 추가</Button>}
-            <Button>엑셀 다운로드</Button>
+            {isAdmin && <AddDataModal />}
+            <Button onClick={() => createXml(rowData)}>엑셀 다운로드</Button>
           </div>
           <Filter fetchData={fetchGridRowData} />
           <DepositGrid rowData={rowData} fetchData={fetchGridRowData} />
