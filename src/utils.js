@@ -13,7 +13,9 @@ export function rangeFormatter(start, end) {
 }
 
 export function connectSSE() {
+  console.log("IS RUNNING");
   const accessToken = sessionStorage.getItem("accessToken");
+  let retryTime = 0;
   if (!accessToken) return null;
   const eventSource = new EventSourcePolyfill(SSE_BASE_URL, {
     withCredentials: true,
@@ -25,6 +27,13 @@ export function connectSSE() {
 
   eventSource.onopen = (e) => {
     console.log("CONNECTED");
+  };
+
+  eventSource.onerror = () => {
+    if (retryTime > 2) {
+      eventSource.close();
+    }
+    retryTime++;
   };
 
   return eventSource;
