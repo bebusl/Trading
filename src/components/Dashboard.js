@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { dashboardRequest } from "../api/transactionAPI";
+import { useFilterState } from "../context/FilterContext";
 import { useSSEState } from "../context/SSEContext";
 import DashboardCard from "./DashboardCard";
 
@@ -21,7 +22,7 @@ const yElementKeys = Object.keys(yTitleMapper);
 const tElementKeys = Object.keys(tTitleMapper);
 
 function Dashboard(props) {
-  const { curCompany } = props;
+  const { curCompany } = useFilterState();
   const [dashboardInfo, setDashboardInfo] = useState({
     ytotalDeposit: 0,
     ytotalWithdraw: 0,
@@ -39,17 +40,17 @@ function Dashboard(props) {
     const getRealtimeDashboardData = (event) => {
       console.log("GET DASHBOARD", event);
       const data = JSON.parse(event.data);
-      // 실시간 업데이트 필터링 company이름은 그냥 전역적으로 관리해야겠네...
-      if (data.companyName === curCompany)
+      if (data.companyName === curCompany.companyName)
         setDashboardInfo((prev) => Object.assign({}, prev, data));
     };
 
-    SSEClient?.addEventListener("dashboard", getRealtimeDashboardData);
+    ///**temp block */
+    //SSEClient?.addEventListener("dashboard", getRealtimeDashboardData);
 
-    return () => {
-      if (SSEClient)
-        SSEClient.removeEventListener("dashboard", getRealtimeDashboardData);
-    };
+    // return () => {
+    //   if (SSEClient)
+    //     SSEClient.removeEventListener("dashboard", getRealtimeDashboardData);
+    // };
   }, []);
 
   useEffect(() => {
@@ -58,13 +59,12 @@ function Dashboard(props) {
         const res = await dashboardRequest(curCompany.companyName);
         if (res.data.success) {
           const { success, ...data } = res.data;
-          console.log("IM UPDATED", dashboardInfo);
           setDashboardInfo(data);
         }
       } catch (e) {
         console.error("FAILED TO FETCH DASHBOARD DATA");
       }
-    })(); //curCompany바뀌면 호출해야 함.
+    })();
   }, [curCompany]);
 
   return (

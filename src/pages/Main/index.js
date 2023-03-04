@@ -1,11 +1,20 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, {
+  useState,
+  useMemo,
+  useRef,
+  useEffect,
+  useCallback,
+} from "react";
 import DepositGrid from "../../components/DepositGrid";
-import { Button, Card, Layout, Space, Statistic } from "antd";
-import { LinkOutlined, LogoutOutlined, HeartOutlined } from "@ant-design/icons";
-import { Navigate, useLocation } from "react-router-dom";
-import { dashboardRequest } from "../../api/transactionAPI";
-import { logoff } from "../../utils";
+import { Button, Layout, Space } from "antd";
 import { useSSEState } from "../../context/SSEContext";
+import Dashboard from "../../components/Dashboard";
+import Filter from "../../components/Filter";
+import HeaderContent from "../../components/HeaderContent";
+import dayjs from "dayjs";
+import { ROLE_ADMIN } from "../../constant/role";
+import { useFilterState } from "../../context/FilterContext";
+import { transactionRequest } from "../../api/transactionAPI";
 const { Header, Content } = Layout;
 
 const headerStyle = {
@@ -21,93 +30,70 @@ const contentStyle = {
   minHeight: "calc( 100vh - 64px )",
 };
 
-const CustomCard = ({ title = "title", value = 1000000000, today = false }) => (
-  <Card>
-    <Statistic
-      title={title}
-      value={value}
-      prefix={today ? <HeartOutlined /> : <LinkOutlined />}
-    />
-  </Card>
-);
-
 function Main() {
-  const location = useLocation();
-  const companyList = location.state?.companyList || [];
   const isMobile = useMemo(() => window.matchMedia("(max-width: 600px)"), []);
-
-  const userName = sessionStorage.getItem("userName");
-
-  const [dashboard, setDashboard] = useState({});
+  const [rowData, setRowData] = useState([]);
+  const today = useMemo(() => dayjs().format("YYYY MM/DD"), []);
+  const isToday = useRef(true);
+  const isAdmin = useMemo(
+    () => JSON.parse(sessionStorage.getItem("authority")).includes(ROLE_ADMIN),
+    []
+  );
   const { SSEClient } = useSSEState();
+  const { curCompany, dateRange } = useFilterState();
+
+  const fetchGridRowData = useCallback(async () => {
+    const data = {
+      companyName: curCompany.companyName,
+      startDt: dateRange[0] || today + " 00:00",
+      endDt: dateRange[1] || today + " 24:00",
+    };
+    isToday.current = !dateRange[0] && !dateRange[1] ? true : false;
+
+    try {
+      const res = await transactionRequest(data);
+      if (res.data.success) setRowData(res.data.txs);
+    } catch (e) {
+      console.error("fetch data error");
+    }
+  }, [curCompany, dateRange, today]);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const res = await dashboardRequest(companyList[0].companyName);
-        if (res.data.success) {
-          const { success, ...data } = res.data;
-          setDashboard(data);
-        }
-      } catch (e) {
-        console.error("FAILED TO FETCH DASHBOARD DATA");
-      }
-    })();
-
-    const updateDashboardData = (event) => {
-      console.log("GET DASHBOARD", event);
+    const updateRowData = (event) => {
       const data = JSON.parse(event.data);
-      // 실시간 업데이트 필터링 company이름은 그냥 전역적으로 관리해야겠네...
-      setDashboard((prev) => Object.assign({}, prev, data));
+      console.log(
+        "GET EVENT",
+        curCompany.companyName,
+        data.companyName,
+        curCompany.companyName === data.companyName,
+        data
+      );
+      // SSE로 이벤트 왔을 때 컴퍼니 필터링
+      if (isToday.current && curCompany.companyName === data.companyName) {
+        setRowData((prev) => [data, ...prev]);
+      }
+      //if (isToday.current) setRowData((prev) => [data, ...prev]);
     };
 
-    SSEClient?.addEventListener("dashboard", updateDashboardData);
+    //**temp */
+    // SSEClient.addEventListener("tx", updateRowData);
 
     return () => {
-      if (SSEClient)
-        SSEClient.removeEventListener("dashboard", updateDashboardData);
+      // if (SSEClient) {
+      //   SSEClient.removeEventListener("tx", updateRowData);
+      // }
     };
   }, []);
 
-  const updateDashboard = useCallback(async (company) => {
-    try {
-      const res = await dashboardRequest(company);
-      if (res.data.success) {
-        const { success, ...data } = res.data;
-        setDashboard(data);
-      }
-    } catch (e) {
-      console.error("FAILED TO FETCH DASHBOARD DATA");
-    }
-  }, []);
-
-  const handleClickLogoffBtn = () => {
-    logoff();
-    setDashboard({});
-  };
-
-  if (!userName) {
-    window.alert("로그아웃 되었습니다.");
-    return <Navigate to="/login"></Navigate>;
-  }
+  //선택한 컴퍼니 바뀌면 Data도 바뀜
+  useEffect(() => {
+    fetchGridRowData();
+  }, [curCompany]);
 
   return (
     <Layout>
       <Header style={headerStyle}>
-        <div style={{ fontSize: "1rem" }}>Banking Information</div>
-        <div className="list-container">
-          <div>{userName}님</div>
-          <div>
-            <Button
-              type="text"
-              icon={<LogoutOutlined />}
-              style={{ color: "white" }}
-              onClick={handleClickLogoffBtn}
-            >
-              로그아웃
-            </Button>
-          </div>
-        </div>
+        <HeaderContent />
       </Header>
       <Content style={contentStyle}>
         <Space
@@ -115,53 +101,14 @@ function Main() {
           style={{ width: "100%" }}
           size={isMobile ? [0, 30] : [0, 100]}
         >
-          <div className="card-container">
-            <div className="card-wrapper">
-              <CustomCard
-                title="전날 입금 총액"
-                value={dashboard.ytotalDeposit}
-              />
-              <CustomCard
-                title="전날 출금 총액"
-                value={dashboard.ytotalWithdraw}
-              />
-              <CustomCard
-                title="전날 수수료 총액"
-                value={dashboard.ytotalFee}
-              />
-              <CustomCard
-                title="전날 잔금 총액"
-                value={dashboard.ytotalBalance}
-              />
-            </div>
-            <div className="card-wrapper">
-              <CustomCard
-                title="금일 입금 총액"
-                value={dashboard.totalDeposit}
-                today={true}
-              />
-              <CustomCard
-                title="금일 출금 총액"
-                value={dashboard.totalWithdraw}
-                today={true}
-              />
-              <CustomCard
-                title="금일 수수료 총액"
-                value={dashboard.totalFee}
-                today={true}
-              />
-              <CustomCard
-                title="금일 잔금 총액"
-                value={dashboard.totalBalance}
-                today={true}
-              />
-            </div>
+          <Dashboard />
+          <h2 style={{ textAlign: "left" }}>입/출금 현황</h2>
+          <div style={{ display: "flex", justifyContent: "end" }}>
+            {isAdmin && <Button>데이터 추가</Button>}
+            <Button>엑셀 다운로드</Button>
           </div>
-
-          <DepositGrid
-            companyList={companyList}
-            updateDashboard={updateDashboard}
-          />
+          <Filter fetchData={fetchGridRowData} />
+          <DepositGrid rowData={rowData} fetchData={fetchGridRowData} />
         </Space>
       </Content>
     </Layout>

@@ -1,10 +1,10 @@
-import { lazy } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
+import { FilterContextProvider } from "./context/FilterContext";
 import { SSEContextProvider } from "./context/SSEContext";
 
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
-const Main = lazy(() => import("./pages/Main"));
+import Main from "./pages/Main";
 
 const DefaultRouter = () => (
   <Routes>
@@ -15,7 +15,9 @@ const DefaultRouter = () => (
       path="/main"
       element={
         <SSEContextProvider>
-          <Main />
+          <FilterContextProvider>
+            <Main />
+          </FilterContextProvider>
         </SSEContextProvider>
       }
     />
