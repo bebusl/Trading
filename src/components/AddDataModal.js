@@ -57,7 +57,7 @@ function AddDataModal({ fetchData }) {
         component: (
           <Select name="bank" placeholder="은행">
             <Select.Option value={"KB"}>KB</Select.Option>
-            <Select.Option value={"신한"}>신한</Select.Option>
+            <Select.Option value={"신협"}>신협</Select.Option>
           </Select>
         ),
       },
