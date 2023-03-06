@@ -37,3 +37,7 @@ export const addBankData = ({
     companyName,
   });
 };
+
+export const deleteBankData = (id) => {
+  return secureFetch.delete("/v1/admin/delete-data", { params: { id } });
+};

@@ -43,6 +43,14 @@
   width: 200px !important;
 }
 
+.ag-row-selected {
+  background-color: #4abbff;
+}
+
+.ag-cell-focus {
+  border: 1px solid red;
+}
+
 @media only screen and (max-width: 600px) {
   .card-wrapper .ant-card-body {
     padding: 3px;
