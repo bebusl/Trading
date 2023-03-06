@@ -13,7 +13,6 @@ export function rangeFormatter(start, end) {
 }
 
 export function connectSSE() {
-  console.log("IS RUNNING");
   const accessToken = sessionStorage.getItem("accessToken");
   let retryTime = 0;
   if (!accessToken) return null;

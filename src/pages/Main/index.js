@@ -16,7 +16,8 @@ import { useFilterState } from "../../context/FilterContext";
 import { transactionRequest } from "../../api/transactionAPI";
 import AddDataModal from "../../components/AddDataModal";
 import createXml from "../../createXml";
-import ListedData from "../../components/ListedData";
+import useSound from "use-sound";
+import dingdongSound from "./alarmsound.mp3";
 const { Header, Content } = Layout;
 
 const headerStyle = {
@@ -33,8 +34,10 @@ const contentStyle = {
 };
 
 function Main({ isAdmin }) {
-  const isMobile = useMemo(() => window.matchMedia("(max-width: 600px)"), []);
   const [rowData, setRowData] = useState([]);
+  const [play] = useSound(dingdongSound, { volume: 0.5 });
+  const playRef = useRef(null);
+  const isMobile = useMemo(() => window.matchMedia("(max-width: 600px)"), []);
   const today = useMemo(() => dayjs().format("YYYY MM/DD"), []);
   const isToday = useRef(true);
 
@@ -62,12 +65,14 @@ function Main({ isAdmin }) {
       console.log(
         `CUR ::: ${curCompany.companyName} || receive data::: ${data.companyName}`
       );
-      if (isAdmin)
+      if (isAdmin) {
+        playRef.current?.click();
         notification.open({
           message: "실시간 데이터 알림",
           description: `${data.companyName}에 입/출금 내역이 추가되었습니다`,
           duration: 5,
         });
+      }
       if (isToday.current && curCompany.companyName === data.companyName) {
         setRowData((prev) => [data, ...prev]);
       }
@@ -94,6 +99,7 @@ function Main({ isAdmin }) {
         <HeaderContent isAdmin={isAdmin} />
       </Header>
       <Content style={contentStyle}>
+        <button ref={playRef} onClick={play} style={{ display: "none" }} />
         <Space
           direction="vertical"
           style={{ width: "100%" }}
