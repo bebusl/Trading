@@ -99,6 +99,7 @@ const DepositGrid = ({ rowData, fetchData }) => {
         setDeleteLoading(false);
         if (res.data.success) {
           setIsDeleteSuccess(true);
+          setOpen(false);
           fetchData();
         } else setIsDeleteSuccess(false);
       } catch (e) {
