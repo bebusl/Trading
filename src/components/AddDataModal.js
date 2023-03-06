@@ -37,7 +37,7 @@ const currencyField = (fieldName) => (
   />
 );
 
-function AddDataModal() {
+function AddDataModal({ fetchData }) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(null);
@@ -54,6 +54,12 @@ function AddDataModal() {
       {
         field: "bank",
         headerName: "은행",
+        component: (
+          <Select name="bank" placeholder="은행">
+            <Select.Option value={"KB"}>KB</Select.Option>
+            <Select.Option value={"신한"}>신한</Select.Option>
+          </Select>
+        ),
       },
       {
         field: "txType",
@@ -64,8 +70,21 @@ function AddDataModal() {
               { value: "DEPOSIT", label: "입금" },
               { value: "WITHDRAW", label: "출금" },
             ].map((data) => (
-              <Select.Option value={data.value} key={data.value}>
+              <Select.Option value={data.value} key={`select-${data.value}`}>
                 {data.label}
+              </Select.Option>
+            ))}
+          </Select>
+        ),
+      },
+      {
+        field: "companyName",
+        headerName: "회사이름",
+        component: (
+          <Select name="companyName" placeholder="회사">
+            {companyList.map(({ companyName }, idx) => (
+              <Select.Option value={companyName} key={idx}>
+                {companyName}
               </Select.Option>
             ))}
           </Select>
@@ -81,36 +100,12 @@ function AddDataModal() {
         type: "number",
         component: currencyField("입/출금금액"),
       },
-      {
-        field: "fee",
-        headerName: "수수료",
-        type: "number",
-        component: currencyField("수수료"),
-      },
-      {
-        field: "balance",
-        headerName: "잔금",
-        type: "number",
-        component: currencyField("잔금"),
-      },
+
       {
         field: "totalAmount",
         headerName: "잔액",
         type: "number",
         component: currencyField("잔액"),
-      },
-      {
-        field: "companyName",
-        headerName: "회사이름",
-        component: (
-          <Select name="companyName" placeholder="회사">
-            {companyList.map(({ companyName }, idx) => (
-              <Select.Option value={companyName} key={idx}>
-                {companyName}
-              </Select.Option>
-            ))}
-          </Select>
-        ),
       },
     ];
   }, [companyList]);
@@ -119,7 +114,8 @@ function AddDataModal() {
 
   const resetForm = () => {
     formRef.current.setFieldsValue(initialField);
-    console.log(formRef.current);
+    setIsLoading(false);
+    setIsSuccess(null);
   };
 
   const onFinish = async (value) => {
@@ -131,9 +127,10 @@ function AddDataModal() {
       if (res.data.success) {
         setIsSuccess(true);
         setIsLoading(false);
-        setInterval(() => {
+        setTimeout(() => {
           resetForm();
           setOpen(false);
+          fetchData();
         }, 3000);
       }
     } catch (e) {

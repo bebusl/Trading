@@ -95,7 +95,7 @@ function Main({ isAdmin }) {
           <Dashboard />
           <h2 style={{ textAlign: "left" }}>입/출금 현황</h2>
           <div style={{ display: "flex", justifyContent: "end" }}>
-            {isAdmin && <AddDataModal />}
+            {isAdmin && <AddDataModal fetchData={fetchGridRowData} />}
             <Button onClick={() => createXml(rowData)}>엑셀 다운로드</Button>
           </div>
           <Filter fetchData={fetchGridRowData} />
