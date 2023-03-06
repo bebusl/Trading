@@ -34,7 +34,7 @@ function Admin({ isAdmin }) {
 
   if (!isAdmin) {
     window.alert("관리자 권한이 필요한 페이지입니다.");
-    return <Navigate to={-1} />;
+    return <Navigate to={"/login"} />;
   }
   // username, password, companyName, feeRate;
 

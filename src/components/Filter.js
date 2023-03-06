@@ -11,7 +11,7 @@ function Filter({ fetchData }) {
     useFilterState();
 
   const isAdmin = useMemo(
-    () => JSON.parse(sessionStorage.getItem("authority")).includes(ROLE_ADMIN),
+    () => JSON.parse(sessionStorage.getItem("authority"))?.includes(ROLE_ADMIN),
     []
   );
 
@@ -29,7 +29,7 @@ function Filter({ fetchData }) {
         placeholder="회사"
         onChange={updateCurCompany}
         value={curCompany.companyName}
-        style={{ width: "5rem" }}
+        style={{ width: "8rem" }}
       >
         {companyList?.map((company) => (
           <Select.Option value={company.companyName} key={company.companyName}>
@@ -41,6 +41,7 @@ function Filter({ fetchData }) {
         placeholder={["입금날짜", "입금날짜"]}
         autoFocus={true}
         onChange={updateDateRange}
+        className="onepage"
       />
 
       <Button icon={<SearchOutlined />} onClick={fetchData}>
