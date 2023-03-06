@@ -6,7 +6,7 @@ import React, {
   useCallback,
 } from "react";
 import DepositGrid from "../../components/DepositGrid";
-import { Button, Layout, Space } from "antd";
+import { Button, Layout, Space, notification } from "antd";
 import { useSSEState } from "../../context/SSEContext";
 import Dashboard from "../../components/Dashboard";
 import Filter from "../../components/Filter";
@@ -16,6 +16,7 @@ import { useFilterState } from "../../context/FilterContext";
 import { transactionRequest } from "../../api/transactionAPI";
 import AddDataModal from "../../components/AddDataModal";
 import createXml from "../../createXml";
+import ListedData from "../../components/ListedData";
 const { Header, Content } = Layout;
 
 const headerStyle = {
@@ -61,6 +62,12 @@ function Main({ isAdmin }) {
       console.log(
         `CUR ::: ${curCompany.companyName} || receive data::: ${data.companyName}`
       );
+      if (isAdmin)
+        notification.open({
+          message: "실시간 데이터 알림",
+          description: `${data.companyName}에 입/출금 내역이 추가되었습니다`,
+          duration: 5,
+        });
       if (isToday.current && curCompany.companyName === data.companyName) {
         setRowData((prev) => [data, ...prev]);
       }
