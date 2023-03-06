@@ -29,30 +29,18 @@
   gap: 0.5rem;
 }
 
-.ag-header-group-cell-label,
+/* 출금 데이터 컬러링 */
+.ag-row.row-withdraw {
+  background-color: rgb(182, 8, 86);
+  color: white;
+}
+
+/* 헤더 가운데 정렬 */
 .ag-header-cell-label {
   justify-content: center;
 }
-
-.ant-picker-panels > *:first-child button.ant-picker-header-next-btn {
-  visibility: visible !important;
-}
-
-.ant-picker-panels > *:first-child button.ant-picker-header-super-next-btn {
-  visibility: visible !important;
-}
-
-.ant-picker-panels > *:last-child {
-  display: none !important;
-}
-
-.ant-picker-panel-container,
-.ant-picker-footer {
-  width: 280px !important;
-}
-
-.ant-picker-footer-extra > div {
-  flex-wrap: wrap !important;
+.ant-input-number-group-addon {
+  width: 200px !important;
 }
 
 @media only screen and (max-width: 600px) {
@@ -68,5 +56,31 @@
 
   .ant-layout-header {
     overflow: hidden;
+  }
+
+  .ag-header-group-cell-label,
+  .ag-header-cell-label {
+    justify-content: center;
+  }
+
+  .ant-picker-panels > *:first-child button.ant-picker-header-next-btn {
+    visibility: visible !important;
+  }
+
+  .ant-picker-panels > *:first-child button.ant-picker-header-super-next-btn {
+    visibility: visible !important;
+  }
+
+  .ant-picker-panels > *:last-child {
+    display: none !important;
+  }
+
+  .ant-picker-panel-container,
+  .ant-picker-footer {
+    width: 280px !important;
+  }
+
+  .ant-picker-footer-extra > div {
+    flex-wrap: wrap !important;
   }
 }

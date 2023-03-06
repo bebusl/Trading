@@ -53,7 +53,6 @@ const DepositGrid = ({ rowData, fetchData }) => {
   const gridStyle = useMemo(() => ({ height: "100%", width: "100%" }), []);
   const defaultColDef = useMemo(() => {
     return {
-      editable: true,
       sortable: true,
       resizable: true,
       filter: true,
@@ -62,6 +61,16 @@ const DepositGrid = ({ rowData, fetchData }) => {
     };
   }, []);
 
+  const rowClassRules = useMemo(
+    () => ({
+      "row-withdraw": (params) => {
+        console.log("getValue", params.api.getValue("txType", params.node));
+        return params.api.getValue("txType", params.node) === "WITHDRAW";
+      },
+    }),
+    []
+  );
+
   return (
     <div style={containerStyle}>
       <div style={gridStyle} className="ag-theme-alpine">
@@ -69,6 +78,7 @@ const DepositGrid = ({ rowData, fetchData }) => {
           rowData={rowData}
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
+          rowClassRules={rowClassRules}
           suppressRowClickSelection={true}
           pivotPanelShow={"always"}
           pagination={true}
