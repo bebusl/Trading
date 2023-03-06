@@ -63,10 +63,8 @@ const DepositGrid = ({ rowData, fetchData }) => {
 
   const rowClassRules = useMemo(
     () => ({
-      "row-withdraw": (params) => {
-        console.log("getValue", params.api.getValue("txType", params.node));
-        return params.api.getValue("txType", params.node) === "WITHDRAW";
-      },
+      "row-withdraw": (params) =>
+        params.api.getValue("txType", params.node) === "WITHDRAW",
     }),
     []
   );

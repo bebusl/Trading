@@ -9,6 +9,7 @@ import {
 } from "antd";
 import dayjs from "dayjs";
 import React, { useState, useRef, useMemo } from "react";
+import { addBankData } from "../api/adminAPI";
 import { useFilterState } from "../context/FilterContext";
 
 const initialField = {
@@ -38,7 +39,8 @@ const currencyField = (fieldName) => (
 
 function AddDataModal() {
   const [open, setOpen] = useState(false);
-  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(null);
   const formRef = useRef(null);
   const { companyList } = useFilterState();
 
@@ -115,26 +117,29 @@ function AddDataModal() {
 
   const showModal = () => setOpen(true);
 
-  const handleOK = () => {
-    setConfirmLoading(true);
-    setTimeout(() => {
-      setConfirmLoading(false);
-    }, 3000);
-  };
-
   const resetForm = () => {
     formRef.current.setFieldsValue(initialField);
     console.log(formRef.current);
   };
-  const onAsyncFail = () => {
-    setConfirmLoading(false);
-  };
 
-  const onFinish = (value) => {
-    //console.log(value, value.length); //txTime은 Date객체로 꼭 바꿔줘야함.~
+  const onFinish = async (value) => {
     const formedValue = Object.assign(value, {
       txTime: dayjs(new Date(value.txTime)).format("YYYY-MM-DD HH:mm"),
     });
+    try {
+      const res = await addBankData(formedValue);
+      if (res.data.success) {
+        setIsSuccess(true);
+        setIsLoading(false);
+        setInterval(() => {
+          resetForm();
+          setOpen(false);
+        }, 3000);
+      }
+    } catch (e) {
+      setIsSuccess(false);
+      setIsLoading(false);
+    }
     console.log(formedValue);
   };
 
@@ -149,9 +154,7 @@ function AddDataModal() {
       <Modal
         title="데이터 추가"
         open={open}
-        confirmLoading={confirmLoading}
         onCancel={handleCancle}
-        onOk={handleOK}
         footer={[<Button onClick={resetForm}>초기화</Button>]}
       >
         <Form
@@ -161,7 +164,7 @@ function AddDataModal() {
           ref={formRef}
         >
           {columns.map((column) => (
-            <Form.Item name={column.field} key={column.field}>
+            <Form.Item name={column.field} key={`input-${column.field}`}>
               {column.component || (
                 <Input
                   type={column.type || "text"}
@@ -181,6 +184,13 @@ function AddDataModal() {
             </Button>
           </Form.Item>
         </Form>
+        {isLoading && <p>데이터 추가 중...</p>}
+        {!isLoading && isSuccess && (
+          <p style={{ color: "green" }}>데이터를 추가했습니다.</p>
+        )}
+        {!isLoading && isSuccess === false && (
+          <p style={{ color: "red" }}>데이터 추가를 실패했습니다.</p>
+        )}
       </Modal>
     </>
   );
