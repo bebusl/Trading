@@ -26,11 +26,13 @@ const headerStyle = {
   display: "flex",
   flexDirection: "row",
   justifyContent: "space-between",
+  background: "#4c5667",
 };
 const contentStyle = {
   textAlign: "center",
   padding: "2rem",
   minHeight: "calc( 100vh - 64px )",
+  background: "#475060",
 };
 
 function Main({ isAdmin }) {
@@ -65,14 +67,14 @@ function Main({ isAdmin }) {
       console.log(
         `CUR ::: ${curCompany.companyName} || receive data::: ${data.companyName}`
       );
-      if (isAdmin) {
-        playRef.current?.click();
-        notification.open({
-          message: "실시간 데이터 알림",
-          description: `${data.companyName}에 입/출금 내역이 추가되었습니다`,
-          duration: 5,
-        });
-      }
+
+      playRef.current?.click();
+      notification.open({
+        message: "실시간 데이터 알림",
+        description: `${data.companyName}에 입/출금 내역이 추가되었습니다`,
+        duration: 5,
+      });
+
       if (isToday.current && curCompany.companyName === data.companyName) {
         setRowData((prev) => [data, ...prev]);
       }

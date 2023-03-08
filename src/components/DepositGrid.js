@@ -3,7 +3,6 @@ import { AgGridReact } from "ag-grid-react";
 
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
-
 import dayjs from "dayjs";
 import ButtonCellRenderer from "./ButtonCellRenderer";
 import { Modal } from "antd";
@@ -132,7 +131,7 @@ const DepositGrid = ({ rowData, fetchData }) => {
           <p style={{ color: "red" }}>삭제 실패</p>
         )}
       </Modal>
-      <div style={gridStyle} className="ag-theme-alpine">
+      <div style={gridStyle} className="ag-theme-alpine-dark">
         <AgGridReact
           rowData={rowData}
           columnDefs={columnDefs}

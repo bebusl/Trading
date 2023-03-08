@@ -3,6 +3,7 @@ export const customTheme = {
     fontFamily: "Pretendard, Avenir, Helvetica, Arial, sans-serif",
     fontSize: 16,
     fontSizeSM: 15,
+    colorPrimaryBg: "#353c48",
   },
 };
 

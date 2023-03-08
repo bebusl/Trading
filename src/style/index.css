@@ -4,6 +4,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #475060;
+  color: rgb(237, 237, 237);
   box-sizing: border-box;
 }
 

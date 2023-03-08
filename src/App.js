@@ -5,14 +5,14 @@ import "./style/App.css";
 
 import DefaultRouter from "./DefaultRouter";
 
-const { defaultAlgorithm } = theme;
+const { darkAlgorithm } = theme;
 
 function App() {
   return (
     <ConfigProvider
       theme={{
         ...customTheme,
-        algorithm: defaultAlgorithm,
+        algorithm: darkAlgorithm,
       }}
     >
       <DefaultRouter />

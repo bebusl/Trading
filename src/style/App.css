@@ -50,6 +50,9 @@
 .ag-cell-focus {
   border: 1px solid red;
 }
+.ant-card {
+  background-color: #353c48;
+}
 
 @media only screen and (max-width: 600px) {
   .card-wrapper .ant-card-body {
