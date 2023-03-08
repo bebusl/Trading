@@ -30,7 +30,8 @@ export function connectSSE() {
 
   eventSource.onerror = () => {
     if (retryTime > 2) {
-      eventSource.close();
+      console.log("OVER 2TIMEs");
+      //eventSource.close();
     }
     retryTime++;
   };
