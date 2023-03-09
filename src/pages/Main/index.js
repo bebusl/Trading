@@ -38,8 +38,11 @@ const contentStyle = {
 function Main({ isAdmin }) {
   const [rowData, setRowData] = useState([]);
   const [play] = useSound(dingdongSound, { volume: 0.5 });
-  const playRef = useRef(null);
-  const isMobile = useMemo(() => window.matchMedia("(max-width: 600px)"), []);
+  const [playAlarm, setPlayAlarm] = useState(false);
+  const isMobile = useMemo(
+    () => window.matchMedia("(max-width: 600px)").matches,
+    []
+  );
   const today = useMemo(() => dayjs().format("YYYY MM/DD"), []);
   const isToday = useRef(true);
 
@@ -64,11 +67,10 @@ function Main({ isAdmin }) {
   const updateRowData = useCallback(
     (event) => {
       const data = JSON.parse(event.data);
-      console.log(
-        `CUR ::: ${curCompany.companyName} || receive data::: ${data.companyName}`
-      );
-
-      playRef.current?.click();
+      // console.log(
+      //   `CUR ::: ${curCompany.companyName} || receive data::: ${data.companyName}`
+      // );
+      if (playAlarm) play();
       notification.open({
         message: "실시간 데이터 알림",
         description: `${data.companyName}에 입/출금 내역이 추가되었습니다`,
@@ -79,7 +81,7 @@ function Main({ isAdmin }) {
         setRowData((prev) => [data, ...prev]);
       }
     },
-    [curCompany]
+    [curCompany, playAlarm, play]
   );
 
   useEffect(() => {
@@ -93,27 +95,52 @@ function Main({ isAdmin }) {
         SSEClient.removeEventListener("tx", updateRowData);
       }
     };
-  }, [curCompany]);
+  }, [curCompany, playAlarm]);
 
   return (
     <Layout>
       <Header style={headerStyle}>
-        <HeaderContent isAdmin={isAdmin} />
+        <HeaderContent isAdmin={isAdmin}>
+          <div>
+            <label htmlFor="alarm">알림음 울리기</label>
+            <input
+              name="alarm"
+              type="checkbox"
+              checked={playAlarm}
+              onChange={() => {
+                console.log("IS TRIGGERED?", playAlarm);
+                setPlayAlarm((prev) => !prev);
+              }}
+            />
+          </div>
+        </HeaderContent>
       </Header>
       <Content style={contentStyle}>
-        <button ref={playRef} onClick={play} style={{ display: "none" }} />
-        <Space
-          direction="vertical"
-          style={{ width: "100%" }}
-          size={isMobile ? [0, 30] : [0, 100]}
-        >
+        <Space direction="vertical" style={{ width: "100%" }} size={[0, 40]}>
           <Dashboard />
-          <h2 style={{ textAlign: "left" }}>입/출금 현황</h2>
-          <div style={{ display: "flex", justifyContent: "end" }}>
-            {isAdmin && <AddDataModal fetchData={fetchGridRowData} />}
-            <Button onClick={() => createXml(rowData)}>엑셀 다운로드</Button>
+          <div
+            style={{
+              display: isMobile ? "block" : "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <h2 style={{ textAlign: "left" }}>입/출금 현황</h2>
+            <div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "end",
+                  marginBottom: "10px",
+                }}
+              >
+                {isAdmin && <AddDataModal fetchData={fetchGridRowData} />}
+                <Button onClick={() => createXml(rowData)}>
+                  엑셀 다운로드
+                </Button>
+              </div>
+              <Filter fetchData={fetchGridRowData} />
+            </div>
           </div>
-          <Filter fetchData={fetchGridRowData} />
           <DepositGrid rowData={rowData} fetchData={fetchGridRowData} />
         </Space>
       </Content>

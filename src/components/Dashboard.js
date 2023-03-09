@@ -39,7 +39,7 @@ function Dashboard() {
   useEffect(() => {
     const getRealtimeDashboardData = (event) => {
       const data = JSON.parse(event.data);
-      console.log("GET DASHBOARD", data.companyName);
+      // console.log("GET DASHBOARD", data.companyName);
 
       if (data.companyName === curCompany.companyName)
         setDashboardInfo((prev) => Object.assign({}, prev, data));

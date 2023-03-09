@@ -4,7 +4,7 @@ import React, { useCallback } from "react";
 import { Link } from "react-router-dom";
 import { logoff } from "../utils";
 
-function HeaderContent({ isAdmin }) {
+function HeaderContent({ isAdmin, children }) {
   const userName = sessionStorage.getItem("userName");
   const handleClickLogoffBtn = useCallback(() => {
     logoff();
@@ -15,6 +15,8 @@ function HeaderContent({ isAdmin }) {
     <>
       <div style={{ fontSize: "1rem" }}>Banking Information</div>
       <div className="list-container">
+        {children}
+
         {isAdmin && (
           <Link to="/admin" style={{ color: "inherit" }}>
             <Button type="text" style={{ color: "white" }}>
