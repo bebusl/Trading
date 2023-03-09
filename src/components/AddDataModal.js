@@ -11,6 +11,7 @@ import dayjs from "dayjs";
 import React, { useState, useRef, useMemo } from "react";
 import { addBankData } from "../api/adminAPI";
 import { useFilterState } from "../context/FilterContext";
+import options from "../options.json";
 
 const initialField = {
   txTime: undefined,
@@ -23,6 +24,8 @@ const initialField = {
   totalAmount: undefined,
   companyName: undefined,
 };
+
+const { banks } = options;
 
 const currencyField = (fieldName) => (
   <InputNumber
@@ -56,8 +59,11 @@ function AddDataModal({ fetchData }) {
         headerName: "은행",
         component: (
           <Select name="bank" placeholder="은행">
-            <Select.Option value={"KB"}>KB</Select.Option>
-            <Select.Option value={"신협"}>신협</Select.Option>
+            {banks.map((bank) => (
+              <Select.Option value={bank} key={`bank-${bank}`}>
+                {bank}
+              </Select.Option>
+            ))}
           </Select>
         ),
       },
